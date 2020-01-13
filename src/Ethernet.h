@@ -53,6 +53,20 @@
 #include "Server.h"
 #include "Udp.h"
 
+// Define it to reduce code size
+#define ETHERNET_NO_INHERITANCE
+
+#ifdef ETHERNET_NO_INHERITANCE
+#define rawIPAddress(ip) (&(ip)[0])
+#define setWriteError()
+#define virtual
+#define _PUBLIC(what)
+#define _USING(what)
+#else
+#define _PUBLIC(what) : public what
+#define _USING(what) using what	
+#endif
+
 enum EthernetLinkStatus {
 	Unknown,
 	LinkON,
@@ -149,7 +163,7 @@ extern EthernetClass Ethernet;
 
 #define UDP_TX_PACKET_MAX_SIZE 24
 
-class EthernetUDP : public UDP {
+class EthernetUDP _PUBLIC(UDP) {
 private:
 	uint16_t _port; // local port to listen on
 	IPAddress _remoteIP; // remote IP address for the incoming packet whilst it's being processed
@@ -182,7 +196,7 @@ public:
 	// Write size bytes from buffer into the packet
 	virtual size_t write(const uint8_t *buffer, size_t size);
 
-	using Print::write;
+	_USING(Print::write);
 
 	// Start processing the next available incoming packet
 	// Returns the size of the packet in bytes, or 0 if no packets are available
@@ -211,7 +225,7 @@ public:
 
 
 
-class EthernetClient : public Client {
+class EthernetClient _PUBLIC(Client) {
 public:
 	EthernetClient() : sockindex(MAX_SOCK_NUM), _timeout(1000) { }
 	EthernetClient(uint8_t s) : sockindex(s), _timeout(1000) { }
@@ -242,7 +256,7 @@ public:
 
 	friend class EthernetServer;
 
-	using Print::write;
+	_USING(Print::write);
 
 private:
 	uint8_t sockindex; // MAX_SOCK_NUM means client not in use
@@ -250,7 +264,7 @@ private:
 };
 
 
-class EthernetServer : public Server {
+class EthernetServer _PUBLIC(Server) {
 private:
 	uint16_t _port;
 public:
@@ -261,7 +275,7 @@ public:
 	virtual size_t write(uint8_t);
 	virtual size_t write(const uint8_t *buf, size_t size);
 	virtual operator bool();
-	using Print::write;
+	_USING(Print::write);
 	//void statusreport();
 
 	// TODO: make private when socket allocation moves to EthernetClass
@@ -315,8 +329,10 @@ public:
 	int checkLease();
 };
 
-
-
-
+#ifdef ETHERNET_NO_INHERITANCE
+#undef virtual
+#undef _PUBLIC
+#undef _USING
+#endif
 
 #endif
