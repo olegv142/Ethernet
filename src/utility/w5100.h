@@ -17,15 +17,18 @@
 #include <Arduino.h>
 #include <SPI.h>
 
+extern SPISettings _spi_ethernet_settings;
+#define SPI_ETHERNET_SETTINGS _spi_ethernet_settings
+
 // Safe for all chips
-#define SPI_ETHERNET_SETTINGS SPISettings(14000000, MSBFIRST, SPI_MODE0)
+#define SPI_ETHERNET_SETTINGS_INIT 14000000, MSBFIRST, SPI_MODE0
 
 // Safe for W5200 and W5500, but too fast for W5100
 // Uncomment this if you know you'll never need W5100 support.
 //  Higher SPI clock only results in faster transfer to hosts on a LAN
 //  or with very low packet latency.  With ordinary internet latency,
 //  the TCP window size & packet loss determine your overall speed.
-//#define SPI_ETHERNET_SETTINGS SPISettings(30000000, MSBFIRST, SPI_MODE0)
+//#define SPI_ETHERNET_SETTINGS_INIT 30000000, MSBFIRST, SPI_MODE0
 
 
 // Require Ethernet.h, because we need MAX_SOCK_NUM
@@ -36,16 +39,16 @@
 
 // Arduino 101's SPI can not run faster than 8 MHz.
 #if defined(ARDUINO_ARCH_ARC32)
-#undef SPI_ETHERNET_SETTINGS
-#define SPI_ETHERNET_SETTINGS SPISettings(8000000, MSBFIRST, SPI_MODE0)
+#undef SPI_ETHERNET_SETTINGS_INIT
+#define SPI_ETHERNET_SETTINGS_INIT 8000000, MSBFIRST, SPI_MODE0
 #endif
 
 // Arduino Zero can't use W5100-based shields faster than 8 MHz
 // https://github.com/arduino-libraries/Ethernet/issues/37#issuecomment-408036848
 // W5500 does seem to work at 12 MHz.  Delete this if only using W5500
 #if defined(__SAMD21G18A__)
-#undef SPI_ETHERNET_SETTINGS
-#define SPI_ETHERNET_SETTINGS SPISettings(8000000, MSBFIRST, SPI_MODE0)
+#undef SPI_ETHERNET_SETTINGS_INIT
+#define SPI_ETHERNET_SETTINGS_INIT 8000000, MSBFIRST, SPI_MODE0
 #endif
 
 

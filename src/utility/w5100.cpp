@@ -47,7 +47,7 @@
 #endif
 
 
-
+SPISettings _spi_ethernet_settings(SPI_ETHERNET_SETTINGS_INIT);
 
 // W5100 controller instance
 uint8_t  W5100Class::chip = 0;
