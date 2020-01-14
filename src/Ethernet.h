@@ -90,6 +90,7 @@ private:
 	static IPAddress _dnsServerAddress;
 	static DhcpClass* _dhcp;
 public:
+	static int begin(); // Init adaptor
 	// Initialise the Ethernet shield to use the provided MAC address and
 	// gain the rest of the configuration through DHCP.
 	// Returns 0 if the DHCP configuration failed, and 1 if it succeeded
