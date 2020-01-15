@@ -31,7 +31,7 @@ int EthernetClass::begin()
 	return W5100.init();
 }
 
-int EthernetClass::begin(uint8_t *mac, unsigned long timeout, unsigned long responseTimeout)
+int EthernetClass::begin(uint8_t *mac, const char* hostname, unsigned long timeout, unsigned long responseTimeout)
 {
 	static DhcpClass s_dhcp;
 	_dhcp = &s_dhcp;
@@ -44,7 +44,7 @@ int EthernetClass::begin(uint8_t *mac, unsigned long timeout, unsigned long resp
 	SPI.endTransaction();
 
 	// Now try to get our config info from a DHCP server
-	int ret = _dhcp->beginWithDHCP(mac, timeout, responseTimeout);
+	int ret = _dhcp->beginWithDHCP(mac, hostname, timeout, responseTimeout);
 	if (ret == 1) {
 		// We've successfully found a DHCP server and got our configuration
 		// info, so set things accordingly
@@ -187,6 +187,13 @@ IPAddress EthernetClass::gatewayIP()
 	W5100.getGatewayIp(ret.raw_address());
 	SPI.endTransaction();
 	return ret;
+}
+
+bool EthernetClass::getHostname(char buff[HOSTNAME_LEN])
+{
+	if (!_dhcp) return false;
+	_dhcp->getHostname(buff);
+	return true;
 }
 
 void EthernetClass::setMACAddress(const uint8_t *mac_address)

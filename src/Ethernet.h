@@ -94,7 +94,8 @@ public:
 	// Initialise the Ethernet shield to use the provided MAC address and
 	// gain the rest of the configuration through DHCP.
 	// Returns 0 if the DHCP configuration failed, and 1 if it succeeded
-	static int begin(uint8_t *mac, unsigned long timeout = 60000, unsigned long responseTimeout = 4000);
+	static int begin(uint8_t *mac, const char* hostname = 0,
+		unsigned long timeout = 60000, unsigned long responseTimeout = 4000);
 	static int maintain();
 	static EthernetLinkStatus linkStatus();
 	static EthernetHardwareStatus hardwareStatus();
@@ -111,6 +112,12 @@ public:
 	static IPAddress subnetMask();
 	static IPAddress gatewayIP();
 	static IPAddress dnsServerIP() { return _dnsServerAddress; }
+
+#define HOSTNAME_LEN 12
+	// The hostname is valid only when using DHCP for initialization.
+	// It has predefined length. In case the name passed to begin() call is
+	// shorter the remaining symbols will represent MAC address bytes in hex.
+	static bool getHostname(char buff[HOSTNAME_LEN]);
 
 	void setMACAddress(const uint8_t *mac_address);
 	void setLocalIP(const IPAddress local_ip);
@@ -289,6 +296,7 @@ private:
 	uint32_t _dhcpInitialTransactionId;
 	uint32_t _dhcpTransactionId;
 	uint8_t  _dhcpMacAddr[6];
+	const char* _hostname;
 #ifdef __arm__
 	uint8_t  _dhcpLocalIp[4] __attribute__((aligned(4)));
 	uint8_t  _dhcpSubnetMask[4] __attribute__((aligned(4)));
@@ -326,8 +334,10 @@ public:
 	IPAddress getDhcpServerIp();
 	IPAddress getDnsServerIp();
 
-	int beginWithDHCP(uint8_t *, unsigned long timeout = 60000, unsigned long responseTimeout = 4000);
+	int beginWithDHCP(uint8_t* mac, const char* hostname = 0,
+		unsigned long timeout = 60000, unsigned long responseTimeout = 4000);
 	int checkLease();
+	void getHostname(char buff[HOSTNAME_LEN]);
 };
 
 #ifdef ETHERNET_NO_INHERITANCE
