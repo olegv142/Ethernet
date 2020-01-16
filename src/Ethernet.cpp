@@ -31,7 +31,7 @@ int EthernetClass::begin()
 	return W5100.init();
 }
 
-int EthernetClass::begin(uint8_t *mac, const char* hostname, unsigned long timeout, unsigned long responseTimeout)
+int EthernetClass::begin(uint8_t *mac, const char* hprefix, unsigned long timeout, unsigned long responseTimeout)
 {
 	static DhcpClass s_dhcp;
 	_dhcp = &s_dhcp;
@@ -44,7 +44,7 @@ int EthernetClass::begin(uint8_t *mac, const char* hostname, unsigned long timeo
 	SPI.endTransaction();
 
 	// Now try to get our config info from a DHCP server
-	int ret = _dhcp->beginWithDHCP(mac, hostname, timeout, responseTimeout);
+	int ret = _dhcp->beginWithDHCP(mac, hprefix, timeout, responseTimeout);
 	if (ret == 1) {
 		// We've successfully found a DHCP server and got our configuration
 		// info, so set things accordingly

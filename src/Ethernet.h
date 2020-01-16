@@ -91,10 +91,13 @@ private:
 	static DhcpClass* _dhcp;
 public:
 	static int begin(); // Init adaptor
+
 	// Initialise the Ethernet shield to use the provided MAC address and
-	// gain the rest of the configuration through DHCP.
-	// Returns 0 if the DHCP configuration failed, and 1 if it succeeded
-	static int begin(uint8_t *mac, const char* hostname = 0,
+	// gain the rest of the configuration through DHCP. Caller may provide hostname prefix
+	// that will be used instead of the default one. The hostname has predefined length (HOSTNAME_LEN).
+	// In case the hprefix is shorter the remaining will be filled with MAC address bytes in hex.
+	// Returns 0 if the DHCP configuration failed, and 1 if it succeeded.
+	static int begin(uint8_t *mac, const char* hprefix = 0,
 		unsigned long timeout = 60000, unsigned long responseTimeout = 4000);
 	static int maintain();
 	static EthernetLinkStatus linkStatus();
@@ -296,7 +299,7 @@ private:
 	uint32_t _dhcpInitialTransactionId;
 	uint32_t _dhcpTransactionId;
 	uint8_t  _dhcpMacAddr[6];
-	const char* _hostname;
+	const char* _hprefix;
 #ifdef __arm__
 	uint8_t  _dhcpLocalIp[4] __attribute__((aligned(4)));
 	uint8_t  _dhcpSubnetMask[4] __attribute__((aligned(4)));
@@ -334,7 +337,7 @@ public:
 	IPAddress getDhcpServerIp();
 	IPAddress getDnsServerIp();
 
-	int beginWithDHCP(uint8_t* mac, const char* hostname = 0,
+	int beginWithDHCP(uint8_t* mac, const char* hprefix = 0,
 		unsigned long timeout = 60000, unsigned long responseTimeout = 4000);
 	int checkLease();
 	void getHostname(char buff[HOSTNAME_LEN]);
